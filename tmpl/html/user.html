@@ -1,0 +1,93 @@
+
+<!doctype html>
+<html lang="zh">
+
+<head>
+    <meta name="theme-color" content="#4fc3f7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset=utf8>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/initn.js"></script>
+    <title>管理后台</title>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.geekzu.org/css?family=Inconsolata" rel="stylesheet" type="text/css">
+    <link href="https://fonts.geekzu.org/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+</head>
+
+<body>
+    <nav class="nav-extended light-blue lighten-2">
+        <div class="nav-wrapper">
+            <a href="/" class="brand-logo center"><i class="material-icons right">account_circle</i>管理</a>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href=""><i class="material-icons right">home</i></a></li>
+                <li><a href=""><i class="material-icons right">face</i></a></li>
+                <li><a href=""><i class="material-icons right">cloud</i></a></li>
+                <li><a href=""><i class="material-icons right">format_quote</i></a></li>
+                <li><a href=""><i class="material-icons right">account_circle</i></a></li>
+            </ul>
+        </div>
+        {{if .authorized}}
+            {{ template "nav_tab" }}
+        {{end}}
+    </nav>
+
+    <ul class="sidenav" id="mobile-demo">
+        <li><a href="/"><i class="material-icons right">home</i>主页</a></li>
+        <li><a href=""><i class="material-icons right">face</i>关于我</a></li>
+        <li><a href=""><i class="material-icons right">cloud</i>KodExporer</a></li>
+        <li><a href=""><i class="material-icons right">format_quote</i>PHPMyadmin</a></li>
+        <li><a href=""><i class="material-icons right">account_circle</i>管理</a></li>
+    </ul>
+    {{if .verified}}
+        {{if .authorized}}
+            {{template "user_info" .}}
+        {{else}}
+            {{template "authorization_pending" .uid}}
+        {{end}}
+    {{else}}
+        {{template "verification_pending" .}}
+    {{end}}
+
+
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h4>⚠️错误！</h4>
+            <p id="err_msg"></p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">知道了</a>
+        </div>
+    </div>
+    <script>
+        function pop_modal(message) {
+            $("#err_msg").text(message)
+            $('#modal1').modal()
+            $('#modal1').modal('open')
+        }
+        function check_verif() {
+            $.ajax({
+                        url: './check',
+                        type: 'get',
+                        dataType:'JSON',
+                        success: function (data) {
+                            if (data.code==200){
+                                M.toast({html:data.msg})
+                                location.reload()
+                            }else{
+                                M.toast({html:data.msg})
+                            }
+                        }
+                    })
+        }
+    </script>
+</body>
+
+</html>

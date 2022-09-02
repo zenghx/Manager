@@ -1,0 +1,199 @@
+
+<!doctype html>
+<html lang="zh">
+
+<head>
+    <meta name="theme-color" content="#4fc3f7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset=utf8>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/initn.js"></script>
+    <title>管理后台</title>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.geekzu.org/css?family=Inconsolata" rel="stylesheet" type="text/css">
+    <link href="https://fonts.geekzu.org/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+</head>
+
+<body>
+    <nav class="nav-extended light-blue lighten-2">
+        <div class="nav-wrapper">
+            <a href="/" class="brand-logo center"><i class="material-icons right">account_circle</i>管理</a>
+            <a href="#" data-target="mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href=""><i class="material-icons right">home</i></a></li>
+                <li><a href=""><i class="material-icons right">face</i></a></li>
+                <li><a href=""><i class="material-icons right">cloud</i></a></li>
+                <li><a href=""><i class="material-icons right">format_quote</i></a></li>
+                <li><a href=""><i class="material-icons right">account_circle</i></a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <ul class="sidenav" id="mobile">
+        <li><a href="/"><i class="material-icons right">home</i>主页</a></li>
+        <li><a href=""><i class="material-icons right">face</i>关于我</a></li>
+        <li><a href=""><i class="material-icons right">cloud</i>KodExporer</a></li>
+        <li><a href=""><i class="material-icons right">format_quote</i>PHPMyadmin</a></li>
+        <li><a href=""><i class="material-icons right">account_circle</i>管理</a></li>
+    </ul>
+    <div class="valign-wrapper" style="width:100%;height:100%;position: absolute;">
+        <div class="valign" style="width:100%;">
+            <div class="container">
+                <div class="row">
+                    <div class="col card s12 l6 offset-l3">
+                        <div class="card-content">
+                            <span id="title" class="card-title">登录</span>
+                            <div class="row" id="input-field">
+                                <div class="input-field col s12 ">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" class="validate" pattern="^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$" id="email" required/>
+                                </div>
+                                <div class="input-field col s12">
+                                    <label for="password">密码 </label>
+                                    <input type="password" name="password" class="validate" id="password" required/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-action right-align">
+                            <div id="signin-btns">
+                                <button class="btn-flat" name="show_reg" onclick="show_reg()">去注册
+                                </button>
+                                <button class="btn waves-effect waves-light light-blue lighten-2" name="signin" onclick="do_signin()">登录
+                                    <i class="material-icons right">send</i>
+                                </button>
+                            </div>
+                            <div id="reg-btns" style="display: none;">
+                                <button class="btn-flat" name="show_reg" onclick="show_signin()">返回登录
+                                </button>
+                                <button class="btn waves-effect waves-light light-blue lighten-2" name="signin" onclick="do_reg()">注册
+                                    <i class="material-icons right">send</i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h4>⚠️错误！</h4>
+            <p id="err_msg"></p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">知道了</a>
+        </div>
+    </div>
+    <script>
+        function show_reg() {
+            document.getElementById("title").textContent = "注册"
+            document.getElementById("input-field").innerHTML += "<div class=\"input-field col s12\" id=\"rep_div\">\n<label for=\"password\">重复密码 </label>\n<input type=\"password\" name=\"rep_password\" id=\"rep_password\" class=\"validate\" required/>\n</div>"
+            document.getElementById("signin-btns").style.display = "none"
+            document.getElementById("reg-btns").style.display = "block"
+        }
+
+        function show_signin() {
+            document.getElementById("title").textContent = "登录"
+            document.getElementById("input-field").removeChild(document.getElementById("rep_div"))
+            document.getElementById("signin-btns").style.display = "block"
+            document.getElementById("reg-btns").style.display = "none"
+        }
+
+        function do_signin() {
+            var email_box = document.getElementById("email")
+            var pwd_box = document.getElementById("password")
+            if (email_box.validity.valid && pwd_box.validity.valid) {
+                var obj = {
+                    email: email_box.value,
+                    pwd: CryptoJS.SHA256(pwd_box.value + email_box.value).toString()
+                }
+                $.ajax({
+                        url: './signin',
+                        type: 'post',
+                        data: JSON.stringify(obj),
+                        contentType: 'application/json; charset=utf-8',
+                        dataType:'JSON',
+                        success: function (data) {
+                            if (data.code==200){
+                                M.toast({html:'登录成功'})
+                                window.location.href="./user"
+                                
+                            }else{
+                                M.toast({html:data.msg})
+                            }
+                        }
+                    })
+            } else {
+                if (!email_box.validity.valid) {
+                    M.toast({html: '无效的电子邮箱地址'})
+                    //pop_modal("无效的电子邮箱地址！")
+                } else if (!pwd_box.validity.valid) {
+                    M.toast({html: '无效的密码！'})
+                    //pop_modal.text("无效的密码！")
+                }
+            }
+        }
+
+        function do_reg() {
+            var email_box = document.getElementById("email")
+            var pwd_box = document.getElementById("password")
+            var rep_pwd_box = document.getElementById("rep_password")
+            if (email_box.validity.valid && pwd_box.validity.valid && rep_pwd_box.validity.valid) {
+                if (pwd_box.value != rep_pwd_box.value) {
+                    M.toast({html: '两次输入的密码不一致！'})
+                    //pop_modal("两次输入的密码不一致！")
+                    pwd_box.value = ""
+                    rep_pwd_box.value = ""
+                } else {
+                    var obj = {
+                        email: email_box.value,
+                        pwd: CryptoJS.SHA256(pwd_box.value + email_box.value).toString()
+                    }
+                    $.ajax({
+                        url: './signup',
+                        type: 'post',
+                        data: JSON.stringify(obj),
+                        contentType: 'application/json; charset=utf-8',
+                        dataType:'JSON',
+                        success: function (data) {
+                            if (data.code==200){
+                                M.toast({html:data.msg})
+                                show_signin()
+                            }else{
+                                M.toast({html:data.msg})
+                            }
+                        }
+                    })
+                }
+            } else {
+                if (!email_box.validity.valid) {
+                    M.toast({html: '无效的电子邮箱地址'})
+                    //pop_modal("无效的电子邮箱地址！")
+                } else if (!pwd_box.validity.valid) {
+                    M.toast({html: '无效的密码！'})
+                    //pop_modal("无效的密码！")
+                } else if (!(rep_pwd_box.validity.valid)) {
+                    M.toast({html: '请重复密码！'})
+                    //pop_modal("请重复密码！")
+                }
+            }
+        }
+
+        function pop_modal(message) {
+            $("#err_msg").text(message)
+            $('#modal1').modal()
+            $('#modal1').modal('open')
+        }
+    </script>
+</body>
+
+</html>
